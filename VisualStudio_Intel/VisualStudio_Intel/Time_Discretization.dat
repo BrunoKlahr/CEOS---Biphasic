@@ -1,0 +1,6 @@
+Number of Load Cases						
+2		
+Load Case	Initial Time	Final Time	Steps
+1			0.0d0			500d0		16
+2			500d0			1500d0		32
+

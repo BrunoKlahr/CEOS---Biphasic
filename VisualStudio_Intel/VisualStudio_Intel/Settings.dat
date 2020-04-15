@@ -1,0 +1,90 @@
+ANALYSIS SETTINGS
+	Multiscale Analysis = False
+	Problem Type = Biphasic!Mechanical!Biphasic
+	Analysis Type = Quasi Static
+	Nonlinear Analysis = True
+	Hypothesis of Analysis = 3D 
+	Element Technology = Full Integration
+	Maximum Cut Backs = 10
+END ANALYSIS SETTINGS
+
+LINEAR SOLVER
+	PARDISO
+END LINEAR SOLVER
+
+NONLINEAR SOLVER
+	Newton_Raphson_Full
+	Tol = 1.0e-8
+	MaxIter = 1000
+END NONLINEAR SOLVER
+
+MATERIAL
+	Number of Materials = 1	
+
+	Material ID = 1
+		
+	neo_hookean_isochoric_biphasic
+	G = 0.343e0				!C10 = G/2 = 
+	BulkModulus = 0.243e0	!D1 = 2/K = 
+	k0 = 0.76e-2
+		
+		
+		
+	!Hyper_Isotropic_Biphasic_Spilker
+	!alpha0 = 0.1084e6
+	!alpha1 = 0.592		 
+	!alpha2 = 0.0848	
+	!k0 = 2.519e-10!2.519e-15
+	!PhiF =  0.8
+	!M = 4.638
+	!L = 0.0848
+	
+	!st_venant_kirchhoff_Biphasic
+	!YoungModulus = 0.7e6
+	!Poisson = 0.02	
+	!k0 = 0.76e-14
+	
+	
+	!Compressible_Neo_Hookean_Biphasic
+	!Mu = 3.8e6		 
+	!Lambda = 5.8e8	
+	!k0 = 2.519e-15
+	!PhiF =  0.8
+	!M = 4.638
+	!L = 0.0848
+
+  	!Material ID = 1
+	!Compressible_Neo_Hookean_Biphasic
+	!Mu = 3.8e2		 
+	!Lambda = 5.8e3	
+	!k1 = 1.0E-3
+	!k2 = 1.0E-3
+	!k3 = 1.0E-3
+	
+
+	!Compressible_Neo_Hookean
+	!Mu = 3.8e2		 
+	!Lambda = 5.8e3	
+	
+	
+END MATERIAL 
+
+MESH AND BOUNDARY CONDITIONS
+	Mesh File = Quarto_Cilindro_Cartilagem.cdb!Cilindro_AbaqusD2H4_2.cdb!Cilindro_compressao_conf_rel.cdb!Cilindro_inteiro_compressao_semiconf.cdb !Cilindro_compressao_semiconf.cdb !Cubo_compressao_confinada.cdb !Teste_cubo_T10_edited.cdb!Teste_viga_T10.cdb!Teste_viga_T10_b.cdb!
+	Preprocessor = HyperMesh
+	Time Discretization File = Time_Discretization.dat
+END MESH AND BOUNDARY CONDITIONS
+
+! NOT USED =======================================================================================
+MULTISCALE SETTINGS
+	Kinematical Constraints = Linear
+	F11 = Zero
+	F12 = Zero
+	F13 = Zero 
+	F21 = Zero
+	F22 = Zero
+	F23 = Zero
+	F31 = Zero
+	F32 = Zero
+	F33 = Zero
+END MULTISCALE SETTINGS
