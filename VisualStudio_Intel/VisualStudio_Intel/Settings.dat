@@ -14,20 +14,47 @@ END LINEAR SOLVER
 
 NONLINEAR SOLVER
 	Newton_Raphson_Full
-	Tol = 1.0e-8
-	MaxIter = 1000
+	Tol = 1.0e-16
+	MaxIter = 300
 END NONLINEAR SOLVER
 
 MATERIAL
-	Number of Materials = 1	
-
-	Material ID = 1
+	Number of Materials = 2	
+	
 		
-	neo_hookean_isochoric_biphasic
-	G = 0.343e0				!C10 = G/2 = 
-	BulkModulus = 0.243e0	!D1 = 2/K = 
-	k0 = 0.76e-2
-		
+	 Material ID = 1
+	 Matrix_And_Fiber_Viscoelastic_Biphasic_Trans_Iso
+	 Fiber_Volume_Fraction = 0.75e0
+	 Matrix - K_inf = 1.0e0
+	 Matrix - Mu_inf = 12.50e0 
+	 Matrix - Lambda_inf = 50.0e0 
+	 Matrix - K_e = 1.0e0
+	 Matrix - Mu_e = 100.0e0 
+	 Matrix - Ni_v = 400.0e0
+	 Fiber - C1_inf = 970.174e0 
+	 Fiber - C2_inf = 2.828e0 
+	 Fiber - C1_e = 194.162e0
+	 Fiber - C2_e = 2.397e0
+	 Fiber - Ni_v = 565.612e0
+	 ka0          = 1.52e-1
+	 kt0          = 1.52e-2
+	 Theta        = 0
+	 PhiF		  = 0.7
+	 M 			  = 2
+	 L 			  = 0.1
+	
+	 Material ID = 2
+	 Matrix_Viscoelastic_Biphasic
+	 K_inf = 1.0e0
+	 Mu_inf = 1.10e-3
+	 Lambda_inf = 110.0e-3
+	 K_e = 1.0e0
+	 Mu_e = 2.40e-3 
+	 Ni_v = 12.80e-3
+	 k0 = 3e-1
+	 PhiF		  = 0.7
+	 M 			  = 2
+	 L 			  = 0.1
 		
 		
 	!Hyper_Isotropic_Biphasic_Spilker
@@ -40,10 +67,14 @@ MATERIAL
 	!L = 0.0848
 	
 	!st_venant_kirchhoff_Biphasic
-	!YoungModulus = 0.7e6
-	!Poisson = 0.02	
-	!k0 = 0.76e-14
-	
+	!YoungModulus = 1.0e8
+	!Poisson = 0.30	
+	!k0 = 1.0e-5
+		
+	!neo_hookean_isochoric_biphasic
+	!G = 0.3846e8
+	!BulkModulus = 0.833e8
+	!k0 = 1.0e-5
 	
 	!Compressible_Neo_Hookean_Biphasic
 	!Mu = 3.8e6		 
@@ -70,7 +101,7 @@ MATERIAL
 END MATERIAL 
 
 MESH AND BOUNDARY CONDITIONS
-	Mesh File = Quarto_Cilindro_Cartilagem.cdb!Cilindro_AbaqusD2H4_2.cdb!Cilindro_compressao_conf_rel.cdb!Cilindro_inteiro_compressao_semiconf.cdb !Cilindro_compressao_semiconf.cdb !Cubo_compressao_confinada.cdb !Teste_cubo_T10_edited.cdb!Teste_viga_T10.cdb!Teste_viga_T10_b.cdb!
+	Mesh File = Teste_RVE1FibraHelicoidal.cdb !Cilindro_inteiro_compressao_semiconf.cdb !Cilindro_compressao_semiconf.cdb !Cubo_compressao_confinada.cdb !Teste_cubo_T10_edited.cdb!Teste_viga_T10.cdb!Teste_viga_T10_b.cdb!
 	Preprocessor = HyperMesh
 	Time Discretization File = Time_Discretization.dat
 END MESH AND BOUNDARY CONDITIONS

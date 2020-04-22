@@ -386,8 +386,8 @@ module ModFEMAnalysisBiphasic
             ! Staggered variables
             NormStagSolid = 0.0d0
             NormStagFluid = 0.0d0
-            TolSTSolid    = 1.0d-4
-            TolSTFluid    = 1.0d-4
+            TolSTSolid    = 1.0d-3
+            TolSTFluid    = 1.0d-3
             
             nLoadCases = BC%GetNumberOfLoadCases() !Verificar
 
@@ -480,12 +480,12 @@ module ModFEMAnalysisBiphasic
                     VSolidconverged = VSolid
                     ASolidconverged = ASolid
                     
-                    if ( (LC == 1) .and. (ST == 1) ) then
-                        !-----------------------------------------------------------------------------------
-                        ! Calculando campo de pressão inicial
-                         call Compute_Initial_Pressure(NLSolver, nDOFSolid, nDOFFluid, FEMSoESolid, FEMSoEFluid, Time_alpha0, DeltaTime, Fext_alpha0, DeltaFext, &
-                                                    Ubar_alpha0, DeltaUPresc, FluxExt_alpha0, DeltaFluxExt, Pbar_alpha0, DeltaPPresc,  U, P)
-                    end if
+               !     if ( (LC == 1) .and. (ST == 1) ) then
+               !         !-----------------------------------------------------------------------------------
+               !         ! Calculando campo de pressão inicial
+               !          call Compute_Initial_Pressure(NLSolver, nDOFSolid, nDOFFluid, FEMSoESolid, FEMSoEFluid, Time_alpha0, DeltaTime, Fext_alpha0, DeltaFext, &
+               !                                     Ubar_alpha0, DeltaUPresc, FluxExt_alpha0, DeltaFluxExt, Pbar_alpha0, DeltaPPresc,  U, P)
+               !     end if
                     
                     ! Switch Pressure Converged
                     Pconverged = P
@@ -565,13 +565,18 @@ module ModFEMAnalysisBiphasic
                         NormStagFluid = maxval(dabs(Pstaggered-P))
                         
                         if (LC .eq. 1 .and. ST .eq. 1 .and. subStep .eq. 1) then
-                            InitialNormStagSolid = maxval(dabs(U))
-                            InitialNormStagFluid = maxval(dabs(P))
+                            InitialNormStagSolid = maxval(dabs(Ustaggered-U))
+                            InitialNormStagFluid = maxval(dabs(Pstaggered-P))
                         endif
                         
                         ! Teste bisseção (mean pressure)
-                        P = (Pstaggered+P)/2
-                        U = (Ustaggered+U)/2
+                        !if (NormStagSolid .ne. 0) then
+                        !    P = (Pstaggered+P)/2
+                        !endif
+                        
+                        !U = (Ustaggered+U)/2
+                        !P = (Ustaggered+P)/2
+                    
                      
                         
                       !  if (ST == 1 .and.  subStep < 10) then

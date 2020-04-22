@@ -28,7 +28,10 @@ module ModViscoelasticMatrixBiphasic
 
         ! Variables of material parameters
         !----------------------------------------------------------------------------------------------
-        real(8) :: K_inf, Mu_inf, Lambda_inf, K_e, Mu_e, Ni_v, k0
+        ! Solid Matrix
+        real(8) :: K_inf, Mu_inf, Lambda_inf, K_e, Mu_e, Ni_v
+        ! Biphasic Isotropic
+        real(8) :: k0, PhiF, M, L
 
     end type
 	!XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -208,8 +211,8 @@ module ModViscoelasticMatrixBiphasic
             type(ClassParser)::DataFile
 
 		    !************************************************************************************
-		    character(len=100),dimension(7)::ListOfOptions,ListOfValues
-		    logical,dimension(7)::FoundOption
+		    character(len=100),dimension(10)::ListOfOptions,ListOfValues
+		    logical,dimension(10)::FoundOption
 		    integer::i
 
             !************************************************************************************
@@ -217,7 +220,7 @@ module ModViscoelasticMatrixBiphasic
 		    !************************************************************************************
             allocate (this%Properties)
 
-            ListOfOptions=[ "K_inf", "Mu_inf", "Lambda_inf", "K_e", "Mu_e", "Ni_v", "k0" ]
+            ListOfOptions=[ "K_inf", "Mu_inf", "Lambda_inf", "K_e", "Mu_e", "Ni_v", "k0", "PhiF" , "M", "L"]
 
             call DataFile%FillListOfOptions(ListOfOptions,ListOfValues,FoundOption)
             call DataFile%CheckError
@@ -236,6 +239,9 @@ module ModViscoelasticMatrixBiphasic
             this%Properties%Mu_e        = ListOfValues(5)
             this%Properties%Ni_v        = ListOfValues(6)
             this%Properties%k0          = ListOfValues(7)
+            this%Properties%PhiF        = ListOfValues(8)
+            this%Properties%M           = ListOfValues(9)
+            this%Properties%L           = ListOfValues(10)
 
 
 		    !************************************************************************************
@@ -1116,24 +1122,25 @@ module ModViscoelasticMatrixBiphasic
             real(8),dimension(:,:),intent(inout):: Kf
             real(8)                             :: k, k0, PhiF, PhiS, Js, L, M
             
+            !Parametros da evolução da permeabilidade (Mow)
             k0 = this%Properties%k0
-            !PhiF = this%Properties%PhiF
-            !PhiS = 1 - PhiF
-            !L = this%Properties%L
-            !M = this%Properties%M
+            L = this%Properties%L
+            M = this%Properties%M
             
-            !Js = det(this%F)
+            PhiF = this%Properties%PhiF     ! Porosidade
+            PhiS = 1 - PhiF                 ! Solidez
+
+            
+            ! Atualização permeabilidade
+            Js = det(this%F)
             !k = k0*((Js-1)/PhiF + 1)**2
-            !k = k0*(((Js - PhiS)/(1-PhiS))**L)*exp(M*(Js**2 - 1)/2)
+            k = k0*(((Js - PhiS)/(1-PhiS))**L)*exp(M*(Js**2 - 1)/2)
                         
             Kf = 0.0d0
-            Kf(1,1) = k0
-            Kf(2,2) = k0
-            Kf(3,3) = k0
+            Kf(1,1) = k
+            Kf(2,2) = k
+            Kf(3,3) = k
             
-            !Kf(1,1) = this%Properties%k1
-            !Kf(2,2) = this%Properties%k2
-            !Kf(3,3) = this%Properties%k3
             
         end subroutine
         !==========================================================================================

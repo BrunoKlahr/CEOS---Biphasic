@@ -5,7 +5,7 @@
 POST PROCESSOR 
 
 	Post Processor = HyperView 12 !None !GiD 7 !
-	Results = Displacements , Cauchy Stress , Logarithmic Strain, Pressure !, Fiber_Direction! Logarithmic Strain !, Fiber_Direction , Fiber_Dissipation , Matrix_Dissipation !,  , Cauchy_Stress_Fiber_Contribution, Cauchy_Stress_Matrix_Contribution ! , First Piola Stress, Deformation Grad !,  , Logarithmic Strain !, von Mises Cauchy Stress
+	Results = Displacements , Pressure, Relative Velocity, Cauchy Stress, Fiber_Direction !!! Cauchy Stress , Logarithmic Strain, Pressure , Fiber_Direction, Relative_Velocity! Logarithmic Strain !, Fiber_Direction , Fiber_Dissipation , Matrix_Dissipation !,  , Cauchy_Stress_Fiber_Contribution, Cauchy_Stress_Matrix_Contribution ! , First Piola Stress, Deformation Grad !,  , Logarithmic Strain !, von Mises Cauchy Stress
 	File Name = hypermesh_results.hwascii
 	
 END POST PROCESSOR 

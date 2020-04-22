@@ -33,7 +33,7 @@ module ModViscoelasticMatrixFiberBiphasicTransIso
         ! Fiber
         real(8) :: FiberVolumeFraction, C1_inf_Fiber, C2_inf_Fiber, C1_e_Fiber, C2_e_Fiber, Ni_v_Fiber
         ! Biphasic Transversaly Isotropic
-        real(8) :: ka, kt, Theta
+        real(8) :: ka0, kt0, Theta, PhiF, M, L
         real(8),dimension(3)::mInd
 
     end type
@@ -402,8 +402,8 @@ module ModViscoelasticMatrixFiberBiphasicTransIso
             type(ClassParser)::DataFile
 
 		    !************************************************************************************
-		    character(len=100),dimension(15)::ListOfOptions,ListOfValues
-		    logical,dimension(15)::FoundOption
+		    character(len=100),dimension(18)::ListOfOptions,ListOfValues
+		    logical,dimension(18)::FoundOption
 		    integer::i
             real(8),dimension(3)             :: Vector_MInd
 
@@ -414,7 +414,7 @@ module ModViscoelasticMatrixFiberBiphasicTransIso
 
             ListOfOptions=[ "Fiber_Volume_Fraction", "Matrix - K_inf", "Matrix - Mu_inf", "Matrix - Lambda_inf", &
                             "Matrix - K_e", "Matrix - Mu_e", "Matrix - Ni_v", "Fiber - C1_inf","Fiber - C2_inf", &
-                            "Fiber - C1_e", "Fiber - C2_e","Fiber - Ni_v","ka","kt","Theta" ]
+                            "Fiber - C1_e", "Fiber - C2_e","Fiber - Ni_v","ka0","kt0","Theta","PhiF","M","L" ]
 
             call DataFile%FillListOfOptions(ListOfOptions,ListOfValues,FoundOption)
             call DataFile%CheckError
@@ -438,9 +438,12 @@ module ModViscoelasticMatrixFiberBiphasicTransIso
             this%Properties%C1_e_Fiber          = ListOfValues(10)
             this%Properties%C2_e_Fiber          = ListOfValues(11)
             this%Properties%Ni_v_Fiber          = ListOfValues(12)
-            this%Properties%ka                  = ListOfValues(13)
-            this%Properties%kt                  = ListOfValues(14)
+            this%Properties%ka0                 = ListOfValues(13)
+            this%Properties%kt0                 = ListOfValues(14)
             this%Properties%Theta               = ListOfValues(15)
+            this%Properties%PhiF                = ListOfValues(16)
+            this%Properties%M                   = ListOfValues(17)
+            this%Properties%L                   = ListOfValues(18)
             
              !------------------------------------------------------------------------------------
             !Calculo do vetor da fibra indeformado            
@@ -1938,24 +1941,38 @@ module ModViscoelasticMatrixFiberBiphasicTransIso
         
             class(ClassViscoelasticMatrixFiberBiphasicTransIso)::this
             real(8),dimension(:,:),intent(inout):: Kf
-            real(8)                             :: ka,kt, NormM
-            real(8),dimension(3)                :: Vector_MDef
+            real(8)                             :: ka0, kt0, ka, kt, NormM, PhiS, PhiF, Js, M, L
+            real(8),dimension(3)                :: Vector_MDef, mX
             real(8)                             :: F(3,3)
             
+            !Parametros da evolução da permeabilidade (Mow) - Transversalmente isotrópico Local
+            M         = this%Properties%M
+            L         = this%Properties%L
+            ka0       = this%Properties%ka0
+            kt0       = this%Properties%kt0
             
-            ka = this%Properties%ka
-            kt = this%Properties%kt
             
-            F=this%F          
+            PhiF = this%Properties%PhiF         ! Porosidade
+            PhiS = 1 - PhiF                     ! Solidez
             
+            
+            ! Atualização permeabilidade
+            F=this%F  
+            Js        = det(F)
+            ka = ka0*(((Js - PhiS)/(1-PhiS))**L)*exp(M*(Js**2 - 1)/2) 
+            kt = kt0*(((Js - PhiS)/(1-PhiS))**L)*exp(M*(Js**2 - 1)/2)             
+            
+            ! Fiber Direction
+            mX = this%AdditionalVariables%mX   !(Additional Material)
+            
+            !mX = this%Properties%mInd          ! (Utilizando o Theta)
+
          
             !Montagem do vetor da fibra e deformacao
-            
-            call MatrixVectorMultiply ( 'N', F, this%Properties%mInd, Vector_MDef, 1.0D0, 0.0D0 )
+            call MatrixVectorMultiply ( 'N', F, mX, Vector_MDef, 1.0D0, 0.0D0 )
             NormM=norm(Vector_MDef)
             
             !Montagem da matriz de permeabilidade Global
-            
             kf(1,1)=(Vector_MDef(1)/NormM)*(ka-kt)+kt
             kf(2,2)=(Vector_MDef(2)/NormM)*(ka-kt)+kt
             kf(3,3)=(Vector_MDef(3)/NormM)*(ka-kt)+kt
