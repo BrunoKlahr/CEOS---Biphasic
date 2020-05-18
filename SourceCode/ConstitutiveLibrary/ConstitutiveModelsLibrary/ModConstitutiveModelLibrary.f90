@@ -34,8 +34,8 @@ module ConstitutiveModelLibrary
     use ModGlassy
     use ModVVHW
     use ModVarViscoHydrolysis
+    ! Biphasic models
     use ModCompressibleNeoHookeanBiphasic
-    !Thayller - Adicionado modulo do modelo Neo Hookean Bifasico Transversalmente isotropico
     use ModCompressibleNeoHookeanBiphasicTransIso
     use ModHyperIsotropicBiphasicSpilker
     use ModStVenantKirchhoffBiphasic
@@ -43,34 +43,35 @@ module ConstitutiveModelLibrary
     use ModNeoHookeanIsochoricBiphasicTransIso
     use ModViscoelasticMatrixFiberBiphasicTransIso
     use ModViscoelasticMatrixBiphasic
+    use ModHyperelasticTransIsoBiphasicTransIso
 
     ! Constitutive Models ID registered:
-    type ClassConstitutiveModels
-        integer   :: GeneralizedHookesLawModel              = 1
-        integer   :: J2PlasticityModel                      = 2
-        integer   :: NeoHookeanModel                        = 3
-        integer   :: NeoHookeanQ1P0Model                    = 4
-        integer   :: StVenantKirchhoffModel                 = 5
-        integer   :: HyperelasticQ1P0Model                  = 6
-        integer   :: CompressibleNeoHookeanModel            = 7
-        integer   :: NeoHookeanIsochoricModel               = 8
-        integer   :: HyperelasticTransIsoModel              = 9
-        integer   :: HyperelasticTransIsoCompModel          = 10
-        integer   :: ViscoelasticFiberModel                 = 11
-        integer   :: ViscoelasticMatrixModel                = 12
-        integer   :: ViscoelasticMatrixFiberModel           = 13
-        integer   :: VVHW                                   = 14
-        integer   :: Glassy                                 = 15
-        integer   :: VarViscoHydrolysisModel                = 16
-        integer   :: CompressibleNeoHookeanBiphasicModel    = 17
-        integer   :: HyperIsotropicBiphasicSpilkerModel     = 18
-        integer   :: StVenantKirchhoffBiphasicModel         = 19
-        integer   :: NeoHookeanIsochoricBiphasicModel       = 20
-        !Thayller - Declarado variavel do modelo Neo Hookean Bifasico Transversalmente isotropico
-        integer   :: CompressibleNeoHookeanBiphasicTransIsoModel = 21
-        integer   :: NeoHookeanIsochoricBiphasicTransIsoModel    = 22
-        integer   :: ViscoelasticMatrixFiberBiphasicTransIsoModel= 23
-        integer   :: ViscoelasticMatrixBiphasicModel             = 24
+    type ClassConstitutiveModels                                
+        integer   :: GeneralizedHookesLawModel                      = 1
+        integer   :: J2PlasticityModel                              = 2
+        integer   :: NeoHookeanModel                                = 3
+        integer   :: NeoHookeanQ1P0Model                            = 4
+        integer   :: StVenantKirchhoffModel                         = 5
+        integer   :: HyperelasticQ1P0Model                          = 6
+        integer   :: CompressibleNeoHookeanModel                    = 7
+        integer   :: NeoHookeanIsochoricModel                       = 8
+        integer   :: HyperelasticTransIsoModel                      = 9
+        integer   :: HyperelasticTransIsoCompModel                  = 10
+        integer   :: ViscoelasticFiberModel                         = 11
+        integer   :: ViscoelasticMatrixModel                        = 12
+        integer   :: ViscoelasticMatrixFiberModel                   = 13
+        integer   :: VVHW                                           = 14
+        integer   :: Glassy                                         = 15
+        integer   :: VarViscoHydrolysisModel                        = 16
+        integer   :: CompressibleNeoHookeanBiphasicModel            = 17
+        integer   :: HyperIsotropicBiphasicSpilkerModel             = 18
+        integer   :: StVenantKirchhoffBiphasicModel                 = 19
+        integer   :: NeoHookeanIsochoricBiphasicModel               = 20
+        integer   :: CompressibleNeoHookeanBiphasicTransIsoModel    = 21
+        integer   :: NeoHookeanIsochoricBiphasicTransIsoModel       = 22
+        integer   :: ViscoelasticMatrixFiberBiphasicTransIsoModel   = 23
+        integer   :: ViscoelasticMatrixBiphasicModel                = 24
+        integer   :: HyperelasticTransIsoModelBiphasicTransIsoModel = 25
         
     end type
 
@@ -148,6 +149,7 @@ module ConstitutiveModelLibrary
             type(ClassNeoHookeanIsochoricBiphasicTI_3D)   , pointer , dimension(:) :: NHITIBiphasic_3D
 
             type(ClassHyperelasticTransIso_3D)         , pointer , dimension(:) :: HTI_3D
+            type(ClassHyperelasticTransIsoBiphasicTransIso_3D)         , pointer , dimension(:) :: HTIBiphasicTransIso_3D
 
             type(ClassHyperelasticTransIsoComp_3D)     , pointer , dimension(:) :: HTIC_3D
 
@@ -502,6 +504,22 @@ module ConstitutiveModelLibrary
 
                     endif
                 ! -------------------------------------------------------------------------------
+                    
+                ! -------------------------------------------------------------------------------
+                ! Hyperelastic Transverse Isotropic Biphasic Transverse Isotropic Model
+                ! -------------------------------------------------------------------------------
+                case (ConstitutiveModels % HyperelasticTransIsoModelBiphasicTransIsoModel)
+
+                    if ( AnalysisSettings%Hypothesis == HypothesisOfAnalysis%ThreeDimensional ) then
+
+                            allocate(  HTIBiphasicTransIso_3D(nGP) )
+                            GaussPoints =>  HTIBiphasicTransIso_3D
+
+                    else
+                            call Error("Error: Hyperelastic Transverse Isotropic Biphasic Transverse Isotropic Model - analysis type not available.")
+
+                    endif
+                ! -------------------------------------------------------------------------------
 
                 ! -------------------------------------------------------------------------------
                 ! Hyperelastic Transverse Isotropic (Compressive Transition) Model
@@ -776,11 +794,15 @@ module ConstitutiveModelLibrary
 
                 modelID = ConstitutiveModels%NeoHookeanIsochoricBiphasicTransIsoModel
 
-            elseif ( Comp%CompareStrings('hyperelastic_tranverse_isotropic', model) .and. (AnalysisSettings%ElementTech == ElementTechnologies%Full_Integration) ) then
+            elseif ( Comp%CompareStrings('hyperelastic_transverse_isotropic', model) .and. (AnalysisSettings%ElementTech == ElementTechnologies%Full_Integration) ) then
 
                 modelID = ConstitutiveModels%HyperelasticTransIsoModel
+                
+            elseif ( Comp%CompareStrings('Hyperelastic_Transverse_Isotropic_Biphasic_Trans_Iso', model) .and. (AnalysisSettings%ElementTech == ElementTechnologies%Full_Integration) ) then
 
-            elseif ( Comp%CompareStrings('hyperelastic_tranverse_isotropic_(compressive_transition)', model) .and. (AnalysisSettings%ElementTech == ElementTechnologies%Full_Integration) ) then
+                modelID = ConstitutiveModels%HyperelasticTransIsoModelBiphasicTransIsoModel
+
+            elseif ( Comp%CompareStrings('hyperelastic_transverse_isotropic_(compressive_transition)', model) .and. (AnalysisSettings%ElementTech == ElementTechnologies%Full_Integration) ) then
 
                 modelID = ConstitutiveModels%HyperelasticTransIsoCompModel
 

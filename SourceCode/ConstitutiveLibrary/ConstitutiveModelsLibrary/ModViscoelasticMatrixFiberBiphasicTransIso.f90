@@ -32,7 +32,7 @@ module ModViscoelasticMatrixFiberBiphasicTransIso
         real(8) :: K_inf_Matrix, Mu_inf_Matrix, Lambda_inf_Matrix, K_e_Matrix, Mu_e_Matrix, Ni_v_Matrix
         ! Fiber
         real(8) :: FiberVolumeFraction, C1_inf_Fiber, C2_inf_Fiber, C1_e_Fiber, C2_e_Fiber, Ni_v_Fiber
-        ! Biphasic Transversaly Isotropic
+        ! Biphasic Transversaly Isotropic (Mow's model)
         real(8) :: ka0, kt0, Theta, PhiF, M, L
         real(8),dimension(3)::mInd
 
@@ -1958,16 +1958,26 @@ module ModViscoelasticMatrixFiberBiphasicTransIso
             
             ! Atualização permeabilidade
             F=this%F  
-            Js        = det(F)
+            Js = det(F)
             ka = ka0*(((Js - PhiS)/(1-PhiS))**L)*exp(M*(Js**2 - 1)/2) 
             kt = kt0*(((Js - PhiS)/(1-PhiS))**L)*exp(M*(Js**2 - 1)/2)             
             
-            ! Fiber Direction
-            mX = this%AdditionalVariables%mX   !(Additional Material)
             
-            !mX = this%Properties%mInd          ! (Utilizando o Theta)
-
+            ! Construct mX
+            mX = 0.0d0
          
+            !Montagem do vetor da fibra e deformacao
+            ! Fiber Direction - Helical fibers - Adicional material routine
+            mX = this%AdditionalVariables%mX
+            
+            ! Fiber Direction - Computed with the theta given by the user
+            !mX =  this%Properties%mInd
+            
+            if (norm(mX) == 0) then
+                write(*,*) "Error in GetPermeabilityTensorViscoelasticMatrixFiberBiphasicTransIso, mX = 0"
+                stop
+            endif
+                     
             !Montagem do vetor da fibra e deformacao
             call MatrixVectorMultiply ( 'N', F, mX, Vector_MDef, 1.0D0, 0.0D0 )
             NormM=norm(Vector_MDef)

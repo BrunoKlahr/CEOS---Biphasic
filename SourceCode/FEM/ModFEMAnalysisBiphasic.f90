@@ -570,9 +570,9 @@ module ModFEMAnalysisBiphasic
                         endif
                         
                         ! Teste bisseção (mean pressure)
-                        !if (NormStagSolid .ne. 0) then
-                        !    P = (Pstaggered+P)/2
-                        !endif
+                        if (NormStagSolid .ne. 0) then
+                            P = (Pstaggered+P)/2
+                        endif
                         
                         !U = (Ustaggered+U)/2
                         !P = (Ustaggered+P)/2
