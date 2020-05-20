@@ -5,7 +5,7 @@
 POST PROCESSOR 
 
 	Post Processor = HyperView 12 !None !GiD 7 !
-	Results = Displacements , Pressure, Relative Velocity, Cauchy Stress, Fiber_Direction !!! Cauchy Stress , Logarithmic Strain, Pressure , Fiber_Direction, Relative_Velocity! Logarithmic Strain !, Fiber_Direction , Fiber_Dissipation , Matrix_Dissipation !,  , Cauchy_Stress_Fiber_Contribution, Cauchy_Stress_Matrix_Contribution ! , First Piola Stress, Deformation Grad !,  , Logarithmic Strain !, von Mises Cauchy Stress
+	Results = Displacements , Pressure, Cauchy Stress, Logarithmic Strain, Jacobian !!! Cauchy Stress , Logarithmic Strain, Pressure , Fiber_Direction, Relative_Velocity! Logarithmic Strain !, Fiber_Direction , Fiber_Dissipation , Matrix_Dissipation !,  , Cauchy_Stress_Fiber_Contribution, Cauchy_Stress_Matrix_Contribution ! , First Piola Stress, Deformation Grad !,  , Logarithmic Strain !, von Mises Cauchy Stress
 	File Name = hypermesh_results.hwascii
 	
 END POST PROCESSOR 
@@ -41,11 +41,23 @@ END POST PROCESSOR
 ! Variable Name: First Piola Stress
 ! Components: 1=XX ; 2=YX ; 3=ZX ; 4=XY ; 5=YY ; 6=ZY ; 7=XZ ; 8=YZ ; 9=ZZ ; All
 !-----------------------------------------------------------------------------------------
+!-----------------------------------------------------------------------------------------
+! Location: Macro Structure !(Integrated on all structure variables)! 
+!
+! Variable Name: Total Volume
+! Components: All (Just one scalar)
 !XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-NUMBER OF PROBES = 0
+NUMBER OF PROBES = 1
 
 !XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+PROBE
+	Location = Macro Structure
+	File Name = Volumes.probe
+	Variable Name = Total Volume
+	Components = All 
+END PROBE
+
 
 PROBE
 	Location = Micro Structure

@@ -664,8 +664,8 @@ module ModFEMAnalysis
             theta =  0.0d0   !CUIDAR A ORDEM DO DESENHO NO SOLIDWORKS!!!!!   !1 fibra de 3 voltas: 0.0d0
 
             ! Elemento e Nó de Referência
-            ElemRef = 37!77      !16308  !1          !211 !166 !45271 !15226 !4401     !2 Fibras: 1776  !12 Fibras: 4526       !1 fibra de 3 voltas: 1501
-            NodeRef = 23!1334    !19670  !75         !1064 !110 !289 !5150 !2088     !2 Fibras: 2868  !12 Fibras: 5950       !1 fibra de 3 voltas: 31
+            ElemRef = 77      !16308  !1          !211 !166 !45271 !15226 !4401     !2 Fibras: 1776  !12 Fibras: 4526       !1 fibra de 3 voltas: 1501
+            NodeRef = 1334    !19670  !75         !1064 !110 !289 !5150 !2088     !2 Fibras: 2868  !12 Fibras: 5950       !1 fibra de 3 voltas: 31
 
             !Obtendo o ID do Nó de Referência
             NumberOfNodes =  this%ElementList(ElemRef)%El%GetNumberOfNodes()

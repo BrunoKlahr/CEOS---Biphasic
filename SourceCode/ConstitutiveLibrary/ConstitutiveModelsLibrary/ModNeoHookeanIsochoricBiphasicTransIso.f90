@@ -938,7 +938,7 @@ module ModNeoHookeanIsochoricBiphasicTransIso
             ! Internal variables
             ! -----------------------------------------------------------------------------------
             integer, parameter :: Scalar=1,Vector=2,Tensor=3
-            real (8) :: h , c(6), I(3,3), e(3,3), eV(6)
+            real (8) :: h , c(6), I(3,3), e(3,3), eV(6), J
             real(8),dimension(3):: Vector_MDef
 		    !************************************************************************************
 
@@ -973,7 +973,7 @@ module ModNeoHookeanIsochoricBiphasicTransIso
             
                 case(0)
             
-                    Length = 3
+                    Length = 5
             
                 case(1)
             
@@ -1002,6 +1002,20 @@ module ModNeoHookeanIsochoricBiphasicTransIso
                     !-----------------------------------------------------------------
 
                     Variable(1:Length) = Vector_MDef
+                
+                case(4)
+                    
+                    
+                    
+                case (5)
+
+                    Name='Jacobian'
+                    VariableType = Scalar
+                    Length = 1
+                    !-----------------------------------------------------------------                      
+                    J = det(this%F)
+                    !-----------------------------------------------------------------
+                    Variable(1:Length) = J
             
                 case default
                     call Error("Error retrieving result :: GetResult NeoHookeanIsochoricBiphasic")

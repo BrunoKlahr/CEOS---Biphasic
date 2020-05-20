@@ -588,13 +588,13 @@ module ModCompressibleNeoHookeanBiphasicTransIso
             real(8), dimension(3)     :: Vector_MDef
 
             integer,parameter :: Scalar=1,Vector=2,Tensor=3
-            real (8) :: h , c(6), S(3,3), aux(9)
+            real (8) :: h , c(6), S(3,3), aux(9), J
 
             Name=''
 
             select case (ID)
                 case(0)
-                    Length=4
+                    Length=5
                 case(1)
                     Name='First Piola Stress'
                     VariableType=Tensor
@@ -646,6 +646,19 @@ module ModCompressibleNeoHookeanBiphasicTransIso
                     !-----------------------------------------------------------------
 
                     Variable(1:Length) = Vector_MDef
+                    
+                    
+                case (5)
+
+                    Name='Jacobian'
+                    VariableType = Scalar
+                    Length = 1
+                    !-----------------------------------------------------------------                      
+                    J = det(this%F)
+                    !-----------------------------------------------------------------
+                    Variable(1:Length) = J
+                    
+                    
                 case default
                     call Error("Error retrieving result :: GetResult_CompressibleNeoHookeanBiphasic")
             end select

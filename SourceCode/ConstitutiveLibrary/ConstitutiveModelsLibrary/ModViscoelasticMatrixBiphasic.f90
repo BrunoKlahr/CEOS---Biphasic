@@ -1069,7 +1069,7 @@ module ModViscoelasticMatrixBiphasic
             ! Internal variables
             ! -----------------------------------------------------------------------------------
             integer, parameter :: Scalar=1,Vector=2,Tensor=3
-            real (8) :: Dissipation, FiberStretch, C(3,3), mX(3), m(3), A(3,3)
+            real (8) :: Dissipation, FiberStretch, C(3,3), mX(3), m(3), A(3,3), J
 		    !************************************************************************************
 
 		    !___________________   WARNIG! DO NOT CHANGE OR ERASE THIS BLOCK    _________________
@@ -1081,7 +1081,7 @@ module ModViscoelasticMatrixBiphasic
 
                 case(0)
 
-                    Length=4
+                    Length=5
 
                 case (1)
 
@@ -1103,6 +1103,18 @@ module ModViscoelasticMatrixBiphasic
 
 
                 case (4)
+                    
+                
+                
+                case (5)
+
+                    Name='Jacobian'
+                    VariableType = Scalar
+                    Length = 1
+                    !-----------------------------------------------------------------                      
+                    J = det(this%F)
+                    !-----------------------------------------------------------------
+                    Variable(1:Length) = J
 
 
 

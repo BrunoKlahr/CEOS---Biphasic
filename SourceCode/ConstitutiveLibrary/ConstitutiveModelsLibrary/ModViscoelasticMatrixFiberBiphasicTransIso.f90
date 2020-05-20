@@ -1854,7 +1854,7 @@ module ModViscoelasticMatrixFiberBiphasicTransIso
             ! Internal variables
             ! -----------------------------------------------------------------------------------
             integer, parameter :: Scalar=1,Vector=2,Tensor=3
-            real (8) :: Dissipation, FiberStretch, C(3,3), mX(3), m(3), A(3,3)
+            real (8) :: Dissipation, FiberStretch, C(3,3), mX(3), m(3), A(3,3), J
 		    !************************************************************************************
 
 		    !___________________   WARNIG! DO NOT CHANGE OR ERASE THIS BLOCK    _________________
@@ -1866,7 +1866,7 @@ module ModViscoelasticMatrixFiberBiphasicTransIso
 
                 case(0)
 
-                    Length = 4
+                    Length = 5
 
                 case (1)
 
@@ -1925,6 +1925,16 @@ module ModViscoelasticMatrixFiberBiphasicTransIso
                     Dissipation = this%Properties%Ni_v_Matrix*dot_product(this%dvm_new,this%dvm_new)
                     !-----------------------------------------------------------------
                     Variable(1:Length) = Dissipation
+                    
+                case (5)
+
+                    Name='Jacobian'
+                    VariableType = Scalar
+                    Length = 1
+                    !-----------------------------------------------------------------                      
+                    J = det(this%F)
+                    !-----------------------------------------------------------------
+                    Variable(1:Length) = J
                     
                 case default
 

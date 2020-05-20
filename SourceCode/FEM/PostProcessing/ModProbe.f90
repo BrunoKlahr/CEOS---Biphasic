@@ -18,7 +18,7 @@ module ModProbe
     type ClassVariableNames
         integer  :: Displacements=1 , Temperature=2, CauchyStress=3, LogarithmicStrain=4, &
                     DeformationGradient=5 , FirstPiolaStress=6, UserDefined=7, Pressure = 8, &
-                    RelativeVelocity=9
+                    RelativeVelocity=9, Total_Volume = 10
     end type
     type (ClassVariableNames), parameter :: VariableNames = ClassVariableNames()
 
@@ -67,6 +67,12 @@ module ModProbe
     type, extends(ClassProbe) :: ClassMicroStructureProbe
     contains
         procedure :: WriteProbeResult => WriteProbeResult_MicroStructure
+    end type
+    
+    ! Macro Structure
+    type, extends(ClassProbe) :: ClassMacroStructureProbe
+    contains
+        procedure :: WriteProbeResult => WriteProbeResult_MacroStructure
     end type
 
     ! Nodal Force
@@ -140,6 +146,8 @@ module ModProbe
             enu = VariableNames%FirstPiolaStress
         ELSEIF ( Comp%CompareStrings( Variable,'Relative Velocity') ) then
             enu = VariableNames%RelativeVelocity
+        ELSEIF ( Comp%CompareStrings( Variable,'Total Volume') ) then
+            enu = VariableNames%Total_Volume
         ELSE
             enu = VariableNames%UserDefined
         ENDIF
@@ -627,6 +635,51 @@ module ModProbe
 
     end subroutine
     !==========================================================================================
+    
+        !==========================================================================================
+    subroutine MacroStructureProbeConstructor (Probe, Variable, FileName, ComponentsString)
+
+            ! Modules and implicit declarations
+            ! -----------------------------------------------------------------------------------
+            use Parser
+            implicit none
+
+            ! Object
+            ! -----------------------------------------------------------------------------------
+            class(ClassProbe), pointer :: Probe
+
+            ! Input variables
+            ! -----------------------------------------------------------------------------------
+            character(len=*) :: Variable
+            character(len=*) :: FileName
+            character(len=*) :: ComponentsString
+
+            ! Internal variables
+            ! -----------------------------------------------------------------------------------
+            type(ClassParser) :: Comp
+            type(ClassMacroStructureProbe), pointer :: MacroStructureProbe
+            !************************************************************************************
+
+            call Comp%Setup()
+
+            allocate(MacroStructureProbe)
+
+            MacroStructureProbe%FileName       = FileName
+            MacroStructureProbe%VariableName   = Variable
+            MacroStructureProbe%VariableNameID = ParseVariableName(Variable)
+
+            if ( Comp%CompareStrings(ComponentsString, 'All') ) then
+                MacroStructureProbe%AllComponents = .true.
+            else
+                MacroStructureProbe%AllComponents = .false.
+                Call ParseComponents( ComponentsString , MacroStructureProbe%Components )
+            endif
+
+
+            Probe => MacroStructureProbe
+
+    end subroutine
+    !==========================================================================================
 
     !==========================================================================================
     subroutine NodalForceProbeConstructor(Probe, ProbeHyperMeshFile, FileName, ProbeLoadCollector)
@@ -936,6 +989,70 @@ module ModProbe
     end subroutine
     !==========================================================================================
 
+        !==========================================================================================
+    subroutine WriteProbeResult_MacroStructure(this,FEA)
+
+            ! Modules and implicit declarations
+            ! -----------------------------------------------------------------------------------
+            use ModFEMAnalysis
+            use MathRoutines
+            use Parser
+            use ModContinuumMechanics
+  
+
+            implicit none
+
+            ! Object
+            ! -----------------------------------------------------------------------------------
+            class(ClassMacroStructureProbe) :: this
+
+            ! Input variables
+            ! -----------------------------------------------------------------------------------
+            class(ClassFEMAnalysis) :: FEA
+
+            ! Internal variables
+            ! -----------------------------------------------------------------------------------
+            type (ClassParser) :: Comp
+
+            !real(8), dimension(size(this%Components)) , target :: ProbeVariable
+            integer :: e
+            real(8) :: TotalVol
+            real(8), dimension(1) , target :: ProbeVariable
+
+            !************************************************************************************
+            ! Teste se probe esta ativo
+            if (.not. this%Active) then
+                return
+            endif
+
+            call Comp%Setup()
+
+   
+            select case (this%VariableNameID)
+   
+                
+   
+                ! Writing Total Volume
+                case (VariableNames%Total_Volume)
+   
+                   
+                    TotalVol = 0.0d0
+                    !Loop over Elements
+                    do e = 1,size(FEA%ElementList)
+                        TotalVol = TotalVol + FEA%ElementList(e)%El%Volume
+                    enddo
+                  
+                    ProbeVariable = TotalVol
+                    call this%WriteOnFile( FEA%Time ,  ProbeVariable )       
+   
+                case default
+                stop 'Error in ModProbe - WriteProbeResult_MacroStructure - VariableNameID - not identified'
+   
+            end select
+   
+
+    end subroutine
+    !==========================================================================================
 
 
 

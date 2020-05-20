@@ -578,13 +578,13 @@ module ModCompressibleNeoHookeanBiphasic
             real(8) , dimension(:)    :: Variable
 
             integer,parameter :: Scalar=1,Vector=2,Tensor=3
-            real (8) :: h , c(6), S(3,3), aux(9)
+            real (8) :: h , c(6), S(3,3), aux(9), J
 
             Name=''
 
             select case (ID)
                 case(0)
-                    Length=2
+                    Length=3
                 case(1)
                     Name='First Piola Stress'
                     VariableType=Tensor
@@ -613,9 +613,19 @@ module ModCompressibleNeoHookeanBiphasic
                     Variable(1) = aux(1)  !F11
                     Variable(2) = aux(5)  !F22
                     Variable(4) = aux(4)  !F12
-                    Variable(5) = aux(2)  !F21                    
-
+                    Variable(5) = aux(2)  !F21      
+                    
                 case (3)
+
+                    Name='Jacobian'
+                    VariableType = Scalar
+                    Length = 1
+                    !-----------------------------------------------------------------                      
+                    J = det(this%F)
+                    !-----------------------------------------------------------------
+                    Variable(1:Length) = J
+
+                !case (4)
                     !Name='von Mises Stress'
                     !VariableType = Scalar
                     !Length=1

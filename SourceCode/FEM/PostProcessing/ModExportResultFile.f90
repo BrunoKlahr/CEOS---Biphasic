@@ -250,6 +250,11 @@ module ModExportResultFile
         elseif (  File%CompareStrings(ProbeLocation, 'Micro Structure' ) ) then
 
             call MicroStructureProbeConstructor(ProbeList(i)%Pr, ProbeVariableName, ProbeFileName, ProbeComponentsString)
+        
+        ! Probes de Macro Estrutura
+        elseif (  File%CompareStrings(ProbeLocation, 'Macro Structure' ) ) then
+
+            call MacroStructureProbeConstructor(ProbeList(i)%Pr, ProbeVariableName, ProbeFileName, ProbeComponentsString)
 
         endif
 

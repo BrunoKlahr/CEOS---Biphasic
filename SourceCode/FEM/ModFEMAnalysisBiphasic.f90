@@ -311,7 +311,7 @@ module ModFEMAnalysisBiphasic
             real(8), allocatable, dimension(:) :: P , RFluid , DeltaFluxExt, DeltaPPresc, FluxExt_alpha0, Pbar_alpha0, Pconverged  ! Fluid
             real(8), allocatable, dimension(:) :: Ustaggered, Pstaggered   ! Internal variables of staggered prcedure
             real(8) :: DeltaTime , Time_alpha0
-            real(8) :: NormStagSolid, NormStagFluid, TolSTSolid, TolSTFluid, InitialNormStagSolid, InitialNormStagFluid
+            real(8) :: NormStagSolid, NormStagFluid, TolSTSolid, TolSTFluid, InitialNormStagSolid, InitialNormStagFluid, InitialNormStagMin
             real(8) :: alpha !, alpha_max, alpha_min, alpha_aux
             integer :: LC , ST , nSteps, nLoadCases , SubStep, e, gp
             integer :: FileID_FEMAnalysisResultsSolid, FileID_FEMAnalysisResultsFluid
@@ -384,10 +384,11 @@ module ModFEMAnalysisBiphasic
             Pbar_alpha0 = 0.0d0
 
             ! Staggered variables
-            NormStagSolid = 0.0d0
-            NormStagFluid = 0.0d0
-            TolSTSolid    = 1.0d-3
-            TolSTFluid    = 1.0d-3
+            NormStagSolid       = 0.0d0
+            NormStagFluid       = 0.0d0
+            TolSTSolid          = 1.0d-3
+            TolSTFluid          = 1.0d-3
+            InitialNormStagMin  = 1.0d-12
             
             nLoadCases = BC%GetNumberOfLoadCases() !Verificar
 
@@ -564,9 +565,16 @@ module ModFEMAnalysisBiphasic
                         NormStagSolid = maxval(dabs(Ustaggered-U))
                         NormStagFluid = maxval(dabs(Pstaggered-P))
                         
+                        ! Obtaining the initial Norm for the Staggered convergence criterion                        
                         if (LC .eq. 1 .and. ST .eq. 1 .and. subStep .eq. 1) then
                             InitialNormStagSolid = maxval(dabs(Ustaggered-U))
+                            if (InitialNormStagSolid .lt. InitialNormStagMin) then 
+                                InitialNormStagSolid = InitialNormStagMin
+                            endif
                             InitialNormStagFluid = maxval(dabs(Pstaggered-P))
+                            if (InitialNormStagFluid .lt. InitialNormStagMin) then 
+                                InitialNormStagFluid = InitialNormStagMin
+                            endif
                         endif
                         
                         ! Teste bisseção (mean pressure)
