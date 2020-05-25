@@ -46,9 +46,16 @@ END POST PROCESSOR
 !
 ! Variable Name: Total Volume
 ! Components: All (Just one scalar)
+
+!-----------------------------------------------------------------------------------------
+! Location: Nodal Force !(Reaction Force)! 
+!
+! Load Collector: Name of an assembly of nodes defined in mesh file
+! Hypermesh file = Mesh file where was defined the load collector of reaction force nodes
+! Components: Solid; Total  ( Solid = Just Solid ; Total = Solid + Fluid)
 !XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-NUMBER OF PROBES = 1
+NUMBER OF PROBES = 2
 
 !XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 PROBE
@@ -57,6 +64,15 @@ PROBE
 	Variable Name = Total Volume
 	Components = All 
 END PROBE
+
+PROBE
+	Location = Nodal Force
+	File Name = Reaction_Force.probe
+	Load Collector = Reaction_Force
+	Components = Solid   !Solid    !Total ( Solid = Just Solid ; Total = Solid + Fluid)
+	HyperMesh File = Bloco_micro_m_Reaction.cdb
+END PROBE 
+
 
 
 PROBE

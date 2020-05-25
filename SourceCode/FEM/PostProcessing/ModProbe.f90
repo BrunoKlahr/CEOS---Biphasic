@@ -78,6 +78,8 @@ module ModProbe
     ! Nodal Force
     type, extends(ClassProbe) :: ClassNodalForceProbe
         integer , allocatable , dimension (:) :: Nodes
+        logical :: SolidComponents = .false.
+        logical :: TotalComponents = .false.
     contains
         procedure :: WriteProbeResult => WriteProbeResult_NodalForce
     end type
@@ -682,7 +684,7 @@ module ModProbe
     !==========================================================================================
 
     !==========================================================================================
-    subroutine NodalForceProbeConstructor(Probe, ProbeHyperMeshFile, FileName, ProbeLoadCollector)
+    subroutine NodalForceProbeConstructor(Probe, ProbeHyperMeshFile, FileName, ProbeLoadCollector, ComponentsString)
 
 
             !************************************************************************************
@@ -699,7 +701,8 @@ module ModProbe
 
             ! Input variables
             ! -----------------------------------------------------------------------------------
-            character(*) :: ProbeHyperMeshFile, FileName, ProbeLoadCollector
+            character(*)     :: ProbeHyperMeshFile, FileName, ProbeLoadCollector
+            character(len=*) :: ComponentsString
 
             ! Internal variables
             ! -----------------------------------------------------------------------------------
@@ -710,6 +713,7 @@ module ModProbe
             integer ::  FileNumber, Node
             character(len=255) :: Line
             logical :: found
+            type(ClassParser) :: Comp
 
             !************************************************************************************
 
@@ -772,6 +776,12 @@ module ModProbe
             end if
             allocate ( NodalForceProbe%Nodes,source=NodalForceList)
 
+            
+            if ( Comp%CompareStrings(ComponentsString, 'Solid') ) then
+                NodalForceProbe%SolidComponents = .true.
+            elseif ( Comp%CompareStrings(ComponentsString, 'Total') ) then
+                NodalForceProbe%TotalComponents = .true.
+            endif
 
             Probe => NodalForceProbe
 
@@ -792,6 +802,7 @@ module ModProbe
             ! -----------------------------------------------------------------------------------
             use ModFEMAnalysis
             use Interfaces
+            use ModAnalysis
             implicit none
 
             ! Object
@@ -807,6 +818,7 @@ module ModProbe
             real(8) , allocatable , dimension(:) :: Fint , TotalForce
             integer :: DOF
             type(ClassStatus) :: Status
+            integer :: Component
             !************************************************************************************
 
             ! teste se probe esta ativo
@@ -822,7 +834,37 @@ module ModProbe
 
             allocate( Fint , mold = FEA%U )
             Fint = 0.0d0
-            call InternalForce(FEA%ElementList , FEA%AnalysisSettings , Fint , Status )
+                 
+            
+            
+            ! Option Problem Type 
+             select case ( FEA%AnalysisSettings%ProblemType )
+
+                case ( ProblemTypes%Mechanical )
+                               
+                    call InternalForce(FEA%ElementList , FEA%AnalysisSettings , Fint , Status )
+                    
+                case ( ProblemTypes%Thermal )
+                               
+                    call Error( "Problem Type Thermal not defined in WriteProbeResult_NodalForce" )
+                    
+                case ( ProblemTypes%Biphasic )
+                               
+                    if (this%TotalComponents) then
+                        ! Using the total internal force (Solid + Fluid contributions)
+                        call InternalForceSolid(FEA%ElementList , FEA%AnalysisSettings, FEA%P, Fint , Status )
+                    else if(this%SolidComponents) then
+                        ! Using just the solid contribution on the internal force (Sigma*e)
+                        call InternalForce(FEA%ElementList , FEA%AnalysisSettings , Fint , Status )
+                    else 
+                        call Error( "In a Biphasic analysis, you need to define the Components (Solid or Total)" )
+                    endif
+                             
+                case default
+                    stop "Problem Type not identified in WriteProbeResult_NodalForce"
+            end select
+
+            
 
             allocate(TotalForce( FEA%AnalysisSettings%NDOFnode )  )
             do DOF=1,FEA%AnalysisSettings%NDOFnode

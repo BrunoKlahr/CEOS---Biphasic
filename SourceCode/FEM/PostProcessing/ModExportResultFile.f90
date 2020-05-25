@@ -244,7 +244,7 @@ module ModExportResultFile
         ! Probes de Forças Nodais
         elseif (  File%CompareStrings(ProbeLocation, 'Nodal Force' ) ) then
 
-            call NodalForceProbeConstructor(ProbeList(i)%Pr, ProbeHyperMeshFile, ProbeFileName, ProbeLoadCollector)
+            call NodalForceProbeConstructor(ProbeList(i)%Pr, ProbeHyperMeshFile, ProbeFileName, ProbeLoadCollector, ProbeComponentsString)
 
         ! Probes de Micro Estrutura
         elseif (  File%CompareStrings(ProbeLocation, 'Micro Structure' ) ) then
