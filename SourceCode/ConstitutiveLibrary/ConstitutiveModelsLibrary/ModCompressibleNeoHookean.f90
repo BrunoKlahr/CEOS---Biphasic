@@ -567,13 +567,13 @@ module CompressibleNeoHookean
             real(8) , dimension(:)    :: Variable
 
             integer,parameter :: Scalar=1,Vector=2,Tensor=3
-            real (8) :: h , c(6), S(3,3), aux(9)
+            real (8) :: h , c(6), S(3,3), aux(9), J
 
             Name=''
 
             select case (ID)
                 case(0)
-                    Length=2
+                    Length=4
                 case(1)
                     Name='First Piola Stress'
                     VariableType=Tensor
@@ -617,6 +617,16 @@ module CompressibleNeoHookean
                     !Variable(1:Length)  = dsqrt( (3.0d0/2.0d0) * ((c(1)-h)**2.0d0 + (c(2)-h)**2.0d0 + (c(3)-h)**2.0d0 +2.0d0*c(4)*c(4) +2.0d0*c(5)*c(5) +2.0d0*c(6)*c(6) ) )
 
                     !end associate
+                    
+                case (4)
+
+                    Name='Jacobian'
+                    VariableType = Scalar
+                    Length = 1
+                    !-----------------------------------------------------------------                      
+                    J = det(this%F)
+                    !-----------------------------------------------------------------
+                    Variable(1:Length) = J
                 case default
                     call Error("Error retrieving result :: GetResult_CompressibleNeoHookean")
             end select

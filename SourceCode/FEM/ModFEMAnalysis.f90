@@ -48,6 +48,7 @@ module ModFEMAnalysis
         ! Para usar no Probe...
         real(8), pointer, dimension(:) :: U => null()
         real(8), pointer, dimension(:) :: P => null()
+        real(8), pointer, dimension(:) :: Psolid => null()
         real (8) :: Time
         integer :: LoadCase
 

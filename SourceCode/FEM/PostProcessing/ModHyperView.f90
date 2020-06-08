@@ -125,7 +125,7 @@ module ModHyperView
                     
 
                     do i = 1 , size(NodalValues,1)
-                        NodalValues(i,1) = FEA%P(i)
+                        NodalValues(i,1) = FEA%Psolid(i)
                     enddo
 
                     LoadCaseChar = FEA%LoadCase

@@ -583,7 +583,8 @@ module ModExportResultFile
             FEA%LoadCase = LoadCase
             FEA%Time = Time
             FEA%U => U
-            FEA%P => Psolid  ! É necessário fazer uma conta para obter pressão em todos os nós do sólido
+            FEA%P => P            ! Pressão original nos nós de presão
+            FEA%Psolid => Psolid  ! É necessário fazer uma conta para obter pressão em todos os nós do sólido
             
             ! Update stress and internal variables
             
